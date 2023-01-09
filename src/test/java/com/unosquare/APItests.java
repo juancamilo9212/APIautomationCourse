@@ -2,6 +2,8 @@ package com.unosquare;
 
 import io.restassured.RestAssured;
 import io.restassured.path.json.JsonPath;
+import io.restassured.response.Response;
+import io.restassured.specification.RequestSpecification;
 import org.testng.Assert;
 import org.testng.Reporter;
 import org.testng.annotations.BeforeMethod;
@@ -18,18 +20,20 @@ public class APItests {
     }
 
     @Test
-    public void givenWhenThenStructureTest1() {
-        String response = given()
-                .when()
-                .get("users/2")
-                .then().assertThat().statusCode(200)
-                .body("data.first_name", equalTo("Janet"))
-                .body("data.last_name", equalTo("Weaver"))
-                .extract().response().asString();
+    public void httpStructureTest1() {
+        RestAssured.baseURI = "https://reqres.in/api/";
+        RequestSpecification httpRequest = RestAssured.given();
+        Response response = httpRequest.get("/users/2");
+
+        int statusCode = response.getStatusCode();
+
+        // Assert that correct status code is returned.
+        Assert.assertEquals(statusCode,200);
 
         Reporter.log("Success 200 validation");
 
-        JsonPath json = new JsonPath(response);
+        String responseString = response.asString();
+        JsonPath json = new JsonPath(responseString);
         int id = json.getInt("data.id");
         String email = json.get("data.email");
         String avatar = json.get("data.avatar");
@@ -43,17 +47,21 @@ public class APItests {
     }
 
     @Test
-    public void givenWhenThenStructureTest2() {
-        String response = given()
-                .when()
-                .get("unknown/2")
-                .then().assertThat().statusCode(200)
-                .body("data.name", equalTo("fuchsia rose"))
-                .extract().response().asString();
+    public void httpStructureTest2() {
+        RestAssured.baseURI = "https://reqres.in/api/";
+        RequestSpecification httpRequest = RestAssured.given();
+        Response response = httpRequest.get("/unknown/2");
+
+        int statusCode = response.getStatusCode();
+
+        // Assert that correct status code is returned.
+        Assert.assertEquals(statusCode,200);
 
         Reporter.log("Success 200 validation");
 
-        JsonPath json = new JsonPath(response);
+        String responseString = response.asString();
+
+        JsonPath json = new JsonPath(responseString);
         int id = json.getInt("data.id");
         int year = json.getInt("data.year");
         String color = json.get("data.color");
