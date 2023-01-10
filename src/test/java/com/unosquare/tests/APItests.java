@@ -1,5 +1,7 @@
 package com.unosquare.tests;
 
+import com.unosquare.Controller.ApiCore;
+import com.unosquare.Controller.Constants;
 import io.restassured.RestAssured;
 import io.restassured.path.json.JsonPath;
 import io.restassured.response.Response;
@@ -17,45 +19,22 @@ import java.io.IOException;
 
 public class APItests {
 
+    ApiCore apiCore;
     @BeforeMethod
     public void setUp() {
-        RestAssured.baseURI = "https://reqres.in/api/";
+        apiCore = new ApiCore(Constants.BASE_URL);
     }
     @Test
     public void postTest() {
-        JSONObject requestParams = new JSONObject();
-        requestParams.put("name", "JohnAPI");
-        requestParams.put("job", "QA");
-        RequestSpecification httpRequest = RestAssured.given();
-        httpRequest.headers("Content-Type", "application/json");
-        httpRequest.body(requestParams.toString());
-        Response response = httpRequest.post("/users");
+        Response response = apiCore.postUser();
         Assert.assertEquals(response.getStatusCode(), 201);
-        Reporter.log("Response Body " + response.prettyPrint());
-        Reporter.log("Response code " + response.getStatusCode());
-        Reporter.log("Request Body " + requestParams.toString());
-        Reporter.log("Request URL " + "https://reqres.in/api/users/");
+        apiCore.addMessagesToReport(response);
     }
 
     @Test
     public void postTestWithJSONfile() throws IOException, ParseException {
-        try {
-            JSONParser json = new JSONParser();
-            FileReader reader = new FileReader("src/test/java/com/unosquare/resources/Register.json");
-            Object requestParams = json.parse(reader);
-            RequestSpecification httpRequest = RestAssured.given();
-            httpRequest.headers("Content-Type", "application/json");
-            httpRequest.body(requestParams.toString());
-            Response response = httpRequest.post("/users");
-            Assert.assertEquals(response.getStatusCode(), 201);
-            Reporter.log("Response Body " + response.prettyPrint());
-            Reporter.log("Response code " + response.getStatusCode());
-            Reporter.log("Request Body " + requestParams.toString());
-            Reporter.log("Request URL " + "https://reqres.in/api/users/");
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
+        Response response = apiCore.postUserFromFile();
+        Assert.assertEquals(response.getStatusCode(), 201);
+        apiCore.addMessagesToReport(response);
     }
 }
