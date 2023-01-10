@@ -1,0 +1,7 @@
+<suite name="RestAssuredSuite" verbose="1" >
+    <test name="API testing">
+        <classes>
+            <class name="com.unosquare.tests.APItests"/>
+        </classes>
+    </test>
+</suite>
